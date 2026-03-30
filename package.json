@@ -1,0 +1,23 @@
+{
+  "name": "halal-coin-islamic-budget-manager",
+  "version": "1.0.0",
+  "description": "Islamic budget manager web application with PWA support and Supabase backend",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0",
+    "build": "echo \"Static site - no build required\" && exit 0"
+  },
+  "keywords": [
+    "islamic",
+    "budget",
+    "manager",
+    "pwa",
+    "supabase",
+    "halal",
+    "finance"
+  ],
+  "author": "Halal Coin",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
