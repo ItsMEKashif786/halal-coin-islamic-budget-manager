@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halal Coin - Islamic Budget Manager</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Custom JS -->
+    <script src="js/env.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/dashboard.js" defer></script>
+    <script src="js/expenses.js" defer></script>
+    <script src="js/borrowlend.js" defer></script>
+    <script src="js/main.js" defer></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="mosque-icon">
+                <i class="fas fa-mosque"></i>
+            </div>
+            <h2>بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</h2>
+            <p>Loading Halal Coin...</p>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Authentication Screen -->
+    <div id="auth-screen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="mosque-icon">
+                    <i class="fas fa-mosque"></i>
+                </div>
+                <h1>Halal Coin</h1>
+                <p>Islamic Budget Manager</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-mobile">Mobile Number</label>
+                    <input type="tel" id="login-mobile" placeholder="Enter your mobile number" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-name">Name</label>
+                    <input type="text" id="login-name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group remember-me">
+                    <input type="checkbox" id="remember-me" checked>
+                    <label for="remember-me">Remember Me</label>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <p class="auth-note">By logging in, you agree to our Islamic financial principles</p>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-mobile">Mobile Number</label>
+                    <input type="tel" id="register-mobile" placeholder="Enter your mobile number" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email Address</label>
+                    <input type="email" id="register-email" placeholder="Enter your email address" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                <p class="auth-note">Your data will be securely stored in accordance with Islamic principles</p>
+            </form>
+            
+            <div class="auth-footer">
+                <p>بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
+                <p>In the name of Allah, the Most Gracious, the Most Merciful</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <div class="logo">
+                        <i class="fas fa-mosque"></i>
+                        <span>Halal Coin</span>
+                    </div>
+                </div>
+                
+                <button class="navbar-toggle" id="navbar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="navbar-menu" id="navbar-menu">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                                <i class="fas fa-home"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#expenses" class="nav-link" data-page="expenses">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Expenses</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#borrow-lend" class="nav-link" data-page="borrow-lend">
+                                <i class="fas fa-handshake"></i>
+                                <span>Borrow/Lend</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#profile" class="nav-link" data-page="profile">
+                                <i class="fas fa-user"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="navbar-actions">
+                        <button id="logout-btn" class="btn btn-outline">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h1 class="greeting">ASSALAMUALAIKUM <span id="user-name">User</span></h1>
+                    <p class="page-subtitle">Manage your finances with Islamic principles</p>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Balance</h3>
+                            <p class="stat-amount" id="total-balance">₹0.00</p>
+                            <p class="stat-change">Income - Expenses + Net Borrow</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Expenses</h3>
+                            <p class="stat-amount" id="total-expenses">₹0.00</p>
+                            <p class="stat-change">This month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Lent</h3>
+                            <p class="stat-amount" id="total-lent">₹0.00</p>
+                            <p class="stat-change">Money given to others</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hand-holding"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Borrowed</h3>
+                            <p class="stat-amount" id="total-borrowed">₹0.00</p>
+                            <p class="stat-change">Money taken from others</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Net Borrow Balance</h3>
+                            <p class="stat-amount" id="net-borrow">₹0.00</p>
+                            <p class="stat-change">Lent - Borrowed</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Islamic Date</h3>
+                            <p class="stat-amount" id="islamic-date">Loading...</p>
+                            <p class="stat-change" id="gregorian-date">Today</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Expense Breakdown</h3>
+                            <select id="expense-period" class="chart-filter">
+                                <option value="month">This Month</option>
+                                <option value="week">This Week</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                        <canvas id="expense-chart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Monthly Trend</h3>
+                            <select id="trend-period" class="chart-filter">
+                                <option value="6">Last 6 Months</option>
+                                <option value="3">Last 3 Months</option>
+                                <option value="12">Last 12 Months</option>
+                            </select>
+                        </div>
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Transactions -->
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h3>Recent Transactions</h3>
+                        <a href="#expenses" class="btn btn-text" data-page="expenses">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="transactions-list" id="recent-transactions">
+                        <!-- Transactions will be loaded here -->
+                        <div class="empty-state">
+                            <i class="fas fa-exchange-alt"></i>
+                            <p>No recent transactions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Expenses Page -->
+            <div id="expenses-page" class="page">
+                <div class="page-header">
+                    <h1>Expense Manager</h1>
+                    <p>Track your expenses with Islamic categories</p>
+                </div>
+                
+                <div class="page-actions">
+                    <button id="add-expense-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </button>
+                    <div class="filter-group">
+                        <select id="expense-category-filter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="Food">Food</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Charity">Charity (Sadaqah)</option>
+                            <option value="Family">Family</option>
+                            <option value="Education">Education</option>
+                            <option value="Healthcare">Healthcare</option>
+                        </select>
+                        <input type="date" id="expense-date-filter" class="filter-date">
+                    </div>
+                </div>
+                
+                <!-- Add Expense Modal -->
+                <div id="expense-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add New Expense</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <form id="expense-form">
+                            <div class="form-group">
+                                <label for="expense-amount">Amount (₹)</label>
+                                <input type="number" id="expense-amount" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-category">Category</label>
+                                <select id="expense-category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Charity">Charity (Sadaqah)</option>
+                                    <option value="Family">Family</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-description">Description</label>
+                                <textarea id="expense-description" rows="3" placeholder="Brief description of the expense"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-date">Date</label>
+                                <input type="date" id="expense-date" required>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Expense</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Expenses Table -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-table-body">
+                            <!-- Expenses will be loaded here -->
+                            <tr>
+                                <td colspan="5" class="empty-table">
+                                    <i class="fas fa-receipt"></i>
+                                    <p>No expenses recorded yet</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Borrow/Lend Page -->
+            <div id="borrow-lend-page" class="page">
+                <div class="page-header">
+                    <h1>Borrow/Lend Manager</h1>
+                    <p>Track money given to or taken from others</p>
+                </div>
+                
+                <div class="borrow-lend-tabs">
+                    <button class="bl-tab active" data-type="lent">Money Lent</button>
+                    <button class="bl-tab" data-type="borrowed">Money Borrowed</button>
+                </div>
+                
+                <div class="page-actions">
+                    <button id="add-transaction-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Transaction
+                    </button>
+                </div>
+                
+                <!-- Add Transaction Modal -->
+                <div id="transaction-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add Transaction</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <form id="transaction-form">
+                            <div class="form-group">
+                                <label for="transaction-type">Transaction Type</label>
+                                <select id="transaction-type" required>
+                                    <option value="lent">I Lent Money</option>
+                                    <option value="borrowed">I Borrowed Money</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-person">Person Name</label>
+                                <input type="text" id="transaction-person" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-amount">Amount (₹)</label>
+                                <input type="number" id="transaction-amount" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-due-date">Due Date</label>
+                                <input type="date" id="transaction-due-date">
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-status">Status</label>
+                                <select id="transaction-status" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="overdue">Overdue</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-notes">Notes (Optional)</label>
+                                <textarea id="transaction-notes" rows="3"></textarea>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Transaction</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Person</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrowlend-table-body">
+                            <tr>
+                                <td colspan="5" class="empty-table">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <p>No transactions yet</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Profile Page -->
+            <div id="profile-page" class="page">
+                <div class="page-header">
+                    <h1>Profile Settings</h1>
+                    <p>Manage your account and preferences</p>
+                </div>
+                
+                <div class="profile-grid">
+                    <div class="profile-card">
+                        <h3><i class="fas fa-user"></i> Personal Information</h3>
+                        <form id="profile-form">
+                            <div class="form-group">
+                                <label for="profile-name">Full Name</label>
+                                <input type="text" id="profile-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email">Email Address</label>
+                                <input type="email" id="profile-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-phone">Phone Number</label>
+                                <input type="tel" id="profile-phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-currency">Preferred Currency</label>
+                                <select id="profile-currency">
+                                    <option value="₹">Indian Rupee (₹)</option>
+                                    <option value="$">US Dollar ($)</option>
+                                    <option value="€">Euro (€)</option>
+                                    <option value="£">British Pound (£)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                    
+                    <div class="profile-card">
+                        <h3><i class="fas fa-calculator"></i> Zakat Calculator</h3>
+                        <div class="zakat-calculator">
+                            <div class="form-group">
+                                <label for="zakat-wealth">Total Wealth (Nisab)</label>
+                                <input type="number" id="zakat-wealth" step="0.01" min="0" placeholder="Enter total wealth">
+                            </div>
+                            <div class="form-group">
+                                <label for="zakat-gold">Gold Value (Optional)</label>
+                                <input type="number" id="zakat-gold" step="0.01" min="0" placeholder="Gold value in grams">
+                            </div>
+                            <div class="form-group">
+                                <label for="zakat-silver">Silver Value (Optional)</label>
+                                <input type="number" id="zakat-silver" step="0.01" min="0" placeholder="Silver value in grams">
+                            </div>
+                            <button id="calculate-zakat" class="btn btn-primary">Calculate Zakat</button>
+                            <div id="zakat-result" class="zakat-result hidden">
+                                <h4>Zakat Due: <span id="zakat-amount">0</span></h4>
+                                <p>Zakat is 2.5% of your total wealth above Nisab</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-card">
+                        <h3><i class="fas fa-cog"></i> App Settings</h3>
+                        <div class="settings-list">
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="dark-mode-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Dark Mode</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="notifications-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Notifications</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="auto-sync-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Auto Sync</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="offline-mode-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Offline Mode</span>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button id="export-data" class="btn btn-outline">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button id="clear-data" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install PWA Prompt -->
+    <div id="install-prompt" class="install-prompt hidden">
+        <div class="install-content">
+            <i class="fas fa-download"></i>
+            <h3>Install Halal Coin</h3>
+            <p>Install this app on your device for quick access</p>
+            <div class="install-actions">
+                <button id="install-cancel" class="btn btn-outline">Not Now</button>
+                <button id="install-confirm" class="btn btn-primary">Install</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator hidden">
+        <i class="fas fa-wifi-slash"></i>
+        <span>You are offline</span>
+    </div>
+
+    <!-- Sync Indicator -->
+    <div id="sync-indicator" class="sync-indicator hidden">
+        <i class="fas fa-sync fa-spin"></i>
+        <span>Syncing data...</span>
+    </div>
+
+    <!-- Scripts -->
+</body>
+</html>
