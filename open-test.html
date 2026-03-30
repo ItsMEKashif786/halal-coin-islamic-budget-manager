@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Islamic Budget Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0B3B2F;
+            border-bottom: 3px solid #D4AF37;
+            padding-bottom: 10px;
+        }
+        .test-button {
+            background: #0B3B2F;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .test-button:hover {
+            background: #0a3529;
+        }
+        .feature-list {
+            background: #F5F0E1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .feature-list li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .feature-list li:before {
+            content: "✓";
+            color: #0B3B2F;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .instructions {
+            background: #e8f4f1;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #D4AF37;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Islamic Budget Manager - Test Page</h1>
+        
+        <div class="instructions">
+            <h3>Test Instructions:</h3>
+            <p>Click the button below to open the main application in a new tab/window.</p>
+            <p>If the application doesn't load properly, check the browser console for errors.</p>
+        </div>
+        
+        <a href="index.html" target="_blank" class="test-button">
+            <i class="fas fa-external-link-alt"></i> Open Islamic Budget Manager
+        </a>
+        
+        <div class="feature-list">
+            <h3>Features to Test:</h3>
+            <ul>
+                <li>Islamic design with color scheme (#0B3B2F, #D4AF37, #F5F0E1)</li>
+                <li>Authentication screen with name, mobile, email</li>
+                <li>"Remember Me" functionality</li>
+                <li>Dashboard with "ASSALAMUALAIKUM" greeting</li>
+                <li>Expense manager with categories</li>
+                <li>Borrow/Lend manager with separate tabs</li>
+                <li>Chart.js visualizations</li>
+                <li>Responsive design (test on mobile/tablet)</li>
+                <li>PWA features (manifest, service worker)</li>
+                <li>Navigation between pages</li>
+            </ul>
+        </div>
+        
+        <div class="instructions">
+            <h3>Expected Behavior:</h3>
+            <ol>
+                <li>Application should load without JavaScript errors</li>
+                <li>Loading screen should show briefly then switch to auth screen</li>
+                <li>Authentication form should be functional (UI only - backend needs Supabase config)</li>
+                <li>Navigation between dashboard, expenses, borrow/lend, and profile should work</li>
+                <li>Charts should render (with sample data)</li>
+                <li>Responsive design should adapt to screen size</li>
+                <li>PWA manifest should be detected by browser</li>
+            </ol>
+        </div>
+        
+        <div>
+            <h3>Browser Console Check:</h3>
+            <p>Open Developer Tools (F12) and check Console tab for:</p>
+            <ul>
+                <li>No red error messages</li>
+                <li>"ServiceWorker registration successful" message</li>
+                <li>"Halal Coin initialized" message</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <h3>Next Steps:</h3>
+            <ol>
+                <li>Configure Supabase in <code>js/config.js</code> with your project URL and anon key</li>
+                <li>Run the SQL from README.md to create database tables</li>
+                <li>Test full authentication and data persistence</li>
+                <li>Deploy to Netlify/Vercel for production</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        // Simple test to check if main files load
+        console.log('Test page loaded');
+        
+        // Check if service worker is supported
+        if ('serviceWorker' in navigator) {
+            console.log('✓ Service Worker API supported');
+        } else {
+            console.log('✗ Service Worker API not supported');
+        }
+        
+        // Check if localStorage is available
+        if (typeof(Storage) !== "undefined") {
+            console.log('✓ localStorage supported');
+        } else {
+            console.log('✗ localStorage not supported');
+        }
+    </script>
+</body>
+</html>

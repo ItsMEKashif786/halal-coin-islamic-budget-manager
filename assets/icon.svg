@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#0B3B2F"/>
+  <path d="M256 128C200 128 152 176 152 232C152 288 200 336 256 336C312 336 360 288 360 232C360 176 312 128 256 128Z" fill="#D4AF37"/>
+  <path d="M256 384C200 384 152 432 152 488C152 544 200 592 256 592C312 592 360 544 360 488C360 432 312 384 256 384Z" fill="#F5F0E1"/>
+  <path d="M256 200C234 200 216 218 216 240C216 262 234 280 256 280C278 280 296 262 296 240C296 218 278 200 256 200Z" fill="#0B3B2F"/>
+  <text x="256" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#F5F0E1">ﷺ</text>
+</svg>
