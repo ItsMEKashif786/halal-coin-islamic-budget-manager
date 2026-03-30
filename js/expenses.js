@@ -92,7 +92,7 @@ class ExpenseManager {
             modalTitle.textContent = 'Add New Expense';
             this.currentExpenseId = null;
             form.reset();
-            document.getElementById('expense-date').value = Utils.getCurrentDate();
+            document.getElementById('expense-date').value = window.Utils ? window.Utils.getCurrentDate() : new Date().toISOString().split('T')[0];
         }
         
         modal.classList.remove('hidden');
@@ -110,7 +110,11 @@ class ExpenseManager {
     async saveExpense() {
         const userId = window.AuthManager.getUserId();
         if (!userId) {
-            Utils.showToast('Please login first', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please login first', 'error');
+            } else {
+                alert('Please login first');
+            }
             return;
         }
 
@@ -121,21 +125,35 @@ class ExpenseManager {
 
         // Validation
         if (!amount || amount <= 0) {
-            Utils.showToast('Please enter a valid amount', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter a valid amount', 'error');
+            } else {
+                alert('Please enter a valid amount');
+            }
             return;
         }
 
         if (!category) {
-            Utils.showToast('Please select a category', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please select a category', 'error');
+            } else {
+                alert('Please select a category');
+            }
             return;
         }
 
         if (!date) {
-            Utils.showToast('Please select a date', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please select a date', 'error');
+            } else {
+                alert('Please select a date');
+            }
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const expenseData = {
@@ -158,7 +176,11 @@ class ExpenseManager {
 
                 if (error) throw error;
                 result = data?.[0];
-                Utils.showToast('Expense updated successfully', 'success');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Expense updated successfully', 'success');
+                } else {
+                    alert('Expense updated successfully');
+                }
             } else {
                 // Create new expense
                 const { data, error } = await supabase
@@ -168,7 +190,11 @@ class ExpenseManager {
 
                 if (error) throw error;
                 result = data?.[0];
-                Utils.showToast('Expense added successfully', 'success');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Expense added successfully', 'success');
+                } else {
+                    alert('Expense added successfully');
+                }
             }
 
             // Refresh data
@@ -183,9 +209,15 @@ class ExpenseManager {
 
         } catch (error) {
             console.error('Error saving expense:', error);
-            Utils.showToast('Failed to save expense', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to save expense', 'error');
+            } else {
+                alert('Failed to save expense');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -196,7 +228,9 @@ class ExpenseManager {
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             let query = supabase
@@ -225,9 +259,15 @@ class ExpenseManager {
 
         } catch (error) {
             console.error('Error loading expenses:', error);
-            Utils.showToast('Failed to load expenses', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to load expenses', 'error');
+            } else {
+                alert('Failed to load expenses');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -249,14 +289,14 @@ class ExpenseManager {
 
         tbody.innerHTML = expenses.map(expense => `
             <tr>
-                <td>${Utils.formatDate(expense.date)}</td>
+                <td>${window.Utils ? window.Utils.formatDate(expense.date) : new Date(expense.date).toLocaleDateString('en-IN')}</td>
                 <td>
                     <span class="category-badge" style="background-color: ${this.getCategoryColor(expense.category)}">
                         ${expense.category}
                     </span>
                 </td>
                 <td>${expense.description || '-'}</td>
-                <td class="amount-cell">${Utils.formatCurrency(expense.amount)}</td>
+                <td class="amount-cell">${window.Utils ? window.Utils.formatCurrency(expense.amount) : `$${parseFloat(expense.amount).toFixed(2)}`}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-icon edit-expense" data-id="${expense.id}" title="Edit">
@@ -295,7 +335,9 @@ class ExpenseManager {
     }
 
     async editExpense(expenseId) {
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const { data: expense, error } = await supabase
@@ -310,9 +352,15 @@ class ExpenseManager {
 
         } catch (error) {
             console.error('Error loading expense for edit:', error);
-            Utils.showToast('Failed to load expense', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to load expense', 'error');
+            } else {
+                alert('Failed to load expense');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -321,7 +369,9 @@ class ExpenseManager {
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const { error } = await supabase
@@ -331,7 +381,11 @@ class ExpenseManager {
 
             if (error) throw error;
 
-            Utils.showToast('Expense deleted successfully', 'success');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Expense deleted successfully', 'success');
+            } else {
+                alert('Expense deleted successfully');
+            }
             
             // Refresh data
             this.loadExpenses();
@@ -343,14 +397,20 @@ class ExpenseManager {
 
         } catch (error) {
             console.error('Error deleting expense:', error);
-            Utils.showToast('Failed to delete expense', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to delete expense', 'error');
+            } else {
+                alert('Failed to delete expense');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
     // Get total expenses for a specific period
-    async getTotalExpenses(startDate, endDate = Utils.getCurrentDate()) {
+    async getTotalExpenses(startDate, endDate = window.Utils ? window.Utils.getCurrentDate() : new Date().toISOString().split('T')[0]) {
         const userId = window.AuthManager.getUserId();
         if (!userId) return 0;
 
@@ -373,7 +433,7 @@ class ExpenseManager {
     }
 
     // Get expenses by category for a specific period
-    async getExpensesByCategory(startDate, endDate = Utils.getCurrentDate()) {
+    async getExpensesByCategory(startDate, endDate = window.Utils ? window.Utils.getCurrentDate() : new Date().toISOString().split('T')[0]) {
         const userId = window.AuthManager.getUserId();
         if (!userId) return {};
 

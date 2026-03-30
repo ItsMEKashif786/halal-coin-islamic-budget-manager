@@ -54,7 +54,9 @@ class DashboardManager {
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             await Promise.all([
@@ -65,9 +67,13 @@ class DashboardManager {
             ]);
         } catch (error) {
             console.error('Error loading dashboard data:', error);
-            Utils.showToast('Failed to load dashboard data', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to load dashboard data', 'error');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -77,8 +83,8 @@ class DashboardManager {
 
         try {
             // Get current month expenses
-            const monthStart = Utils.getMonthStartDate();
-            const today = Utils.getCurrentDate();
+            const monthStart = window.Utils ? window.Utils.getMonthStartDate() : this.getMonthStartDateFallback();
+            const today = window.Utils ? window.Utils.getCurrentDate() : new Date().toISOString().split('T')[0];
 
             // Total expenses this month
             const { data: expenses, error: expensesError } = await supabase
@@ -130,7 +136,7 @@ class DashboardManager {
             // Update profile stats
             const profileTotalExpenses = document.getElementById('profile-total-expenses');
             if (profileTotalExpenses) {
-                profileTotalExpenses.textContent = Utils.formatCurrency(totalExpenses);
+                profileTotalExpenses.textContent = window.Utils ? window.Utils.formatCurrency(totalExpenses) : `$${totalExpenses.toFixed(2)}`;
             }
 
             const profileTotalTransactions = document.getElementById('profile-total-transactions');
@@ -148,7 +154,7 @@ class DashboardManager {
     updateStat(elementId, value) {
         const element = document.getElementById(elementId);
         if (element) {
-            element.textContent = Utils.formatCurrency(value);
+            element.textContent = window.Utils ? window.Utils.formatCurrency(value) : `$${value.toFixed(2)}`;
         }
     }
 
@@ -171,7 +177,7 @@ class DashboardManager {
                 startDate = yearAgo.toISOString().split('T')[0];
                 break;
             default: // month
-                startDate = Utils.getMonthStartDate();
+                startDate = window.Utils ? window.Utils.getMonthStartDate() : this.getMonthStartDateFallback();
         }
 
         try {
@@ -243,7 +249,8 @@ class DashboardManager {
                                     const value = context.raw;
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                    return `${context.label}: ${Utils.formatCurrency(value)} (${percentage}%)`;
+                                    const formattedValue = window.Utils ? window.Utils.formatCurrency(value) : `$${value.toFixed(2)}`;
+                                    return `${context.label}: ${formattedValue} (${percentage}%)`;
                                 }
                             }
                         }
@@ -334,7 +341,8 @@ class DashboardManager {
                         tooltip: {
                             callbacks: {
                                 label: (context) => {
-                                    return `Expenses: ${Utils.formatCurrency(context.raw)}`;
+                                    const formattedValue = window.Utils ? window.Utils.formatCurrency(context.raw) : `$${context.raw.toFixed(2)}`;
+                                    return `Expenses: ${formattedValue}`;
                                 }
                             }
                         }
@@ -343,7 +351,7 @@ class DashboardManager {
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                callback: (value) => Utils.formatCurrency(value)
+                                callback: (value) => window.Utils ? window.Utils.formatCurrency(value) : `$${value.toFixed(2)}`
                             }
                         }
                     }
@@ -386,15 +394,15 @@ class DashboardManager {
                 ...expenses.map(exp => ({
                     ...exp,
                     type: 'expense',
-                    displayDate: Utils.formatDate(exp.date),
-                    displayAmount: Utils.formatCurrency(exp.amount),
+                    displayDate: window.Utils ? window.Utils.formatDate(exp.date) : new Date(exp.date).toLocaleDateString('en-IN'),
+                    displayAmount: window.Utils ? window.Utils.formatCurrency(exp.amount) : `$${parseFloat(exp.amount).toFixed(2)}`,
                     description: exp.description || exp.category
                 })),
                 ...transactions.map(trans => ({
                     ...trans,
                     type: 'borrow_lend',
-                    displayDate: Utils.formatDate(trans.created_at),
-                    displayAmount: Utils.formatCurrency(trans.amount),
+                    displayDate: window.Utils ? window.Utils.formatDate(trans.created_at) : new Date(trans.created_at).toLocaleDateString('en-IN'),
+                    displayAmount: window.Utils ? window.Utils.formatCurrency(trans.amount) : `$${parseFloat(trans.amount).toFixed(2)}`,
                     description: `${trans.type === 'lent' ? 'Lent to' : 'Borrowed from'} ${trans.person_name}`
                 }))
             ].sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
@@ -441,7 +449,7 @@ class DashboardManager {
         const gregorianDateElement = document.getElementById('gregorian-date');
         
         if (islamicDateElement) {
-            islamicDateElement.textContent = Utils.getIslamicDate();
+            islamicDateElement.textContent = window.Utils ? window.Utils.getIslamicDate() : 'Islamic Date';
         }
         
         if (gregorianDateElement) {
@@ -453,6 +461,11 @@ class DashboardManager {
                 day: 'numeric'
             });
         }
+    }
+
+    getMonthStartDateFallback() {
+        const today = new Date();
+        return new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
     }
 }
 

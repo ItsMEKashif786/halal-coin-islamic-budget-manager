@@ -5,13 +5,19 @@
 const SUPABASE_URL = window.env?.VITE_SUPABASE_URL || 'https://suqokpiibtnnkatauehu.supabase.co';
 const SUPABASE_ANON_KEY = window.env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1cW9rcGlpYnRubmthdGF1ZWh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NTEyOTksImV4cCI6MjA5MDQyNzI5OX0.eiTxH9M-41enjS7m3rvtUPhnST1mi8H2NuaFt_xJODQ';
 
-// Initialize Supabase client
+// Initialize Supabase client - use a function to defer initialization
 let supabase;
-try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('Supabase client initialized successfully');
-} catch (error) {
-    console.error('Failed to initialize Supabase client:', error);
+function initializeSupabase() {
+    if (window.supabase && window.supabase.createClient) {
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase client initialized successfully');
+            return supabase;
+        } catch (error) {
+            console.error('Failed to initialize Supabase client:', error);
+        }
+    }
+    
     // Create a dummy client to prevent errors
     supabase = {
         from: () => ({
@@ -25,6 +31,16 @@ try {
             signIn: () => ({ data: null, error: new Error('Supabase not initialized') })
         }
     };
+    return supabase;
+}
+
+// Initialize immediately if possible, otherwise wait for DOMContentLoaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeSupabase();
+    });
+} else {
+    initializeSupabase();
 }
 
 // App Configuration

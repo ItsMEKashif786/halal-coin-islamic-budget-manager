@@ -88,23 +88,37 @@ class AuthManager {
         const rememberMe = document.getElementById('remember-me').checked;
 
         if (!name || !mobile || !email) {
-            Utils.showToast('Please fill in all fields', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please fill in all fields', 'error');
+            } else {
+                alert('Please fill in all fields');
+            }
             return;
         }
 
         // Validate mobile number
         if (!/^\d{10}$/.test(mobile)) {
-            Utils.showToast('Please enter a valid 10-digit mobile number', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter a valid 10-digit mobile number', 'error');
+            } else {
+                alert('Please enter a valid 10-digit mobile number');
+            }
             return;
         }
 
         // Validate email
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            Utils.showToast('Please enter a valid email address', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter a valid email address', 'error');
+            } else {
+                alert('Please enter a valid email address');
+            }
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             console.log('Attempting login with:', { name, mobile, email });
@@ -170,17 +184,25 @@ class AuthManager {
                 sessionStorage.setItem('halalCoinUser', JSON.stringify(user));
             }
 
-            Utils.hideLoading();
-            Utils.showToast('Login successful!', 'success');
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Login successful!', 'success');
+            }
             this.showApp();
             
             // Update UI with user info
             this.updateUserUI();
             
         } catch (error) {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
             console.error('Login error details:', error);
-            Utils.showToast('Login failed. Please try again.', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Login failed. Please try again.', 'error');
+            }
         }
     }
 
@@ -190,13 +212,21 @@ class AuthManager {
         const email = document.getElementById('register-email').value.trim();
 
         if (!name || !mobile || !email) {
-            Utils.showToast('Please fill in all fields', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please fill in all fields', 'error');
+            } else {
+                alert('Please fill in all fields');
+            }
             return;
         }
 
         // Validate mobile number
         if (!/^\d{10}$/.test(mobile)) {
-            Utils.showToast('Please enter a valid 10-digit mobile number', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter a valid 10-digit mobile number', 'error');
+            } else {
+                alert('Please enter a valid 10-digit mobile number');
+            }
             return;
         }
 
@@ -239,8 +269,12 @@ class AuthManager {
             }
 
             if (existingUsers && existingUsers.length > 0) {
-                Utils.hideLoading();
-                Utils.showToast('User with this mobile or email already exists', 'warning');
+                if (window.Utils && window.Utils.hideLoading) {
+                    window.Utils.hideLoading();
+                }
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('User with this mobile or email already exists', 'warning');
+                }
                 this.switchAuthTab('login');
                 return;
             }
@@ -264,17 +298,25 @@ class AuthManager {
             localStorage.setItem('halalCoinUser', JSON.stringify(user));
             localStorage.setItem('halalCoinRememberMe', 'true');
 
-            Utils.hideLoading();
-            Utils.showToast('Registration successful!', 'success');
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Registration successful!', 'success');
+            }
             this.showApp();
             
             // Update UI with user info
             this.updateUserUI();
             
         } catch (error) {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
             console.error('Registration error:', error);
-            Utils.showToast('Registration failed. Please try again.', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Registration failed. Please try again.', 'error');
+            }
         }
     }
 
@@ -292,8 +334,12 @@ class AuthManager {
         localStorage.setItem('halalCoinUser', JSON.stringify(user));
         localStorage.setItem('halalCoinRememberMe', 'true');
         
-        Utils.hideLoading();
-        Utils.showToast('Registration successful (offline mode)!', 'success');
+        if (window.Utils && window.Utils.hideLoading) {
+            window.Utils.hideLoading();
+        }
+        if (window.Utils && window.Utils.showToast) {
+            window.Utils.showToast('Registration successful (offline mode)!', 'success');
+        }
         this.showApp();
         
         // Update UI with user info
@@ -319,8 +365,12 @@ class AuthManager {
             sessionStorage.setItem('halalCoinUser', JSON.stringify(user));
         }
         
-        Utils.hideLoading();
-        Utils.showToast('Login successful (offline mode)!', 'success');
+        if (window.Utils && window.Utils.hideLoading) {
+            window.Utils.hideLoading();
+        }
+        if (window.Utils && window.Utils.showToast) {
+            window.Utils.showToast('Login successful (offline mode)!', 'success');
+        }
         this.showApp();
         
         // Update UI with user info
@@ -339,7 +389,9 @@ class AuthManager {
         document.getElementById('login-form')?.reset();
         document.getElementById('register-form')?.reset();
         
-        Utils.showToast('Logged out successfully', 'info');
+        if (window.Utils && window.Utils.showToast) {
+            window.Utils.showToast('Logged out successfully', 'info');
+        }
         this.showAuth();
     }
 

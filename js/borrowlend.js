@@ -128,7 +128,11 @@ class BorrowLendManager {
     async saveTransaction() {
         const userId = window.AuthManager.getUserId();
         if (!userId) {
-            Utils.showToast('Please login first', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please login first', 'error');
+            } else {
+                alert('Please login first');
+            }
             return;
         }
 
@@ -141,12 +145,20 @@ class BorrowLendManager {
 
         // Validation
         if (!personName) {
-            Utils.showToast('Please enter person name', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter person name', 'error');
+            } else {
+                alert('Please enter person name');
+            }
             return;
         }
 
         if (!amount || amount <= 0) {
-            Utils.showToast('Please enter a valid amount', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter a valid amount', 'error');
+            } else {
+                alert('Please enter a valid amount');
+            }
             return;
         }
 
@@ -163,7 +175,9 @@ class BorrowLendManager {
             }
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const transactionData = {
@@ -188,7 +202,11 @@ class BorrowLendManager {
 
                 if (error) throw error;
                 result = data?.[0];
-                Utils.showToast('Transaction updated successfully', 'success');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Transaction updated successfully', 'success');
+                } else {
+                    alert('Transaction updated successfully');
+                }
             } else {
                 // Create new transaction
                 const { data, error } = await supabase
@@ -198,7 +216,11 @@ class BorrowLendManager {
 
                 if (error) throw error;
                 result = data?.[0];
-                Utils.showToast('Transaction added successfully', 'success');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Transaction added successfully', 'success');
+                } else {
+                    alert('Transaction added successfully');
+                }
             }
 
             // Refresh data
@@ -213,9 +235,15 @@ class BorrowLendManager {
 
         } catch (error) {
             console.error('Error saving transaction:', error);
-            Utils.showToast('Failed to save transaction', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to save transaction', 'error');
+            } else {
+                alert('Failed to save transaction');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -226,7 +254,9 @@ class BorrowLendManager {
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const { data: transactions, error } = await supabase
@@ -242,9 +272,15 @@ class BorrowLendManager {
 
         } catch (error) {
             console.error('Error loading transactions:', error);
-            Utils.showToast('Failed to load transactions', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to load transactions', 'error');
+            } else {
+                alert('Failed to load transactions');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -273,9 +309,9 @@ class BorrowLendManager {
                     </span>
                 </td>
                 <td class="amount-cell ${transaction.type === 'lent' ? 'positive' : 'negative'}">
-                    ${Utils.formatCurrency(transaction.amount)}
+                    ${window.Utils ? window.Utils.formatCurrency(transaction.amount) : `$${parseFloat(transaction.amount).toFixed(2)}`}
                 </td>
-                <td>${transaction.due_date ? Utils.formatDate(transaction.due_date) : '-'}</td>
+                <td>${transaction.due_date ? (window.Utils ? window.Utils.formatDate(transaction.due_date) : new Date(transaction.due_date).toLocaleDateString('en-IN')) : '-'}</td>
                 <td>
                     <span class="status-badge ${transaction.status}">
                         ${this.getStatusLabel(transaction.status)}
@@ -333,7 +369,9 @@ class BorrowLendManager {
     }
 
     async editTransaction(transactionId) {
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const { data: transaction, error } = await supabase
@@ -348,9 +386,15 @@ class BorrowLendManager {
 
         } catch (error) {
             console.error('Error loading transaction for edit:', error);
-            Utils.showToast('Failed to load transaction', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to load transaction', 'error');
+            } else {
+                alert('Failed to load transaction');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -359,7 +403,9 @@ class BorrowLendManager {
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const { error } = await supabase
@@ -369,7 +415,11 @@ class BorrowLendManager {
 
             if (error) throw error;
 
-            Utils.showToast('Transaction deleted successfully', 'success');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Transaction deleted successfully', 'success');
+            } else {
+                alert('Transaction deleted successfully');
+            }
             
             // Refresh data
             this.loadTransactions();
@@ -381,14 +431,22 @@ class BorrowLendManager {
 
         } catch (error) {
             console.error('Error deleting transaction:', error);
-            Utils.showToast('Failed to delete transaction', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to delete transaction', 'error');
+            } else {
+                alert('Failed to delete transaction');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
     async markAsPaid(transactionId) {
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const { error } = await supabase
@@ -398,7 +456,11 @@ class BorrowLendManager {
 
             if (error) throw error;
 
-            Utils.showToast('Transaction marked as paid', 'success');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Transaction marked as paid', 'success');
+            } else {
+                alert('Transaction marked as paid');
+            }
             
             // Refresh data
             this.loadTransactions();
@@ -410,9 +472,15 @@ class BorrowLendManager {
 
         } catch (error) {
             console.error('Error marking transaction as paid:', error);
-            Utils.showToast('Failed to update transaction', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to update transaction', 'error');
+            } else {
+                alert('Failed to update transaction');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 

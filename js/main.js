@@ -65,7 +65,11 @@ class MainApp {
             
             currencySetting.addEventListener('change', (e) => {
                 localStorage.setItem('halalCoinCurrency', e.target.value);
-                Utils.showToast('Currency setting saved', 'success');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Currency setting saved', 'success');
+                } else {
+                    alert('Currency setting saved');
+                }
                 
                 // Reload dashboard to update currency display
                 if (window.DashboardManager && document.getElementById('dashboard-page').classList.contains('active')) {
@@ -84,7 +88,11 @@ class MainApp {
                 
                 element.addEventListener('change', (e) => {
                     localStorage.setItem(`halalCoin${setting.charAt(0).toUpperCase() + setting.slice(1)}`, e.target.checked);
-                    Utils.showToast('Setting saved', 'success');
+                    if (window.Utils && window.Utils.showToast) {
+                        window.Utils.showToast('Setting saved', 'success');
+                    } else {
+                        alert('Setting saved');
+                    }
                 });
             }
         });
@@ -93,7 +101,11 @@ class MainApp {
         const editProfileBtn = document.getElementById('edit-profile-btn');
         if (editProfileBtn) {
             editProfileBtn.addEventListener('click', () => {
-                Utils.showToast('Profile editing will be available soon', 'info');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Profile editing will be available soon', 'info');
+                } else {
+                    alert('Profile editing will be available soon');
+                }
             });
         }
 
@@ -114,12 +126,12 @@ class MainApp {
             const savings = parseFloat(document.getElementById('zakat-savings').value) || 0;
             const goldValue = parseFloat(document.getElementById('zakat-gold').value) || 0;
 
-            const zakatAmount = Utils.calculateZakat(savings, goldValue);
+            const zakatAmount = window.Utils ? window.Utils.calculateZakat(savings, goldValue) : (savings + goldValue) * 0.025;
             
             const resultElement = document.getElementById('zakat-result');
             const amountElement = resultElement.querySelector('.zakat-amount');
             
-            amountElement.textContent = Utils.formatCurrency(zakatAmount);
+            amountElement.textContent = window.Utils ? window.Utils.formatCurrency(zakatAmount) : `$${zakatAmount.toFixed(2)}`;
             resultElement.classList.remove('hidden');
             
             if (zakatAmount === 0) {
@@ -132,11 +144,17 @@ class MainApp {
 
     async exportData() {
         if (!window.AuthManager?.getUserId()) {
-            Utils.showToast('Please login first', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please login first', 'error');
+            } else {
+                alert('Please login first');
+            }
             return;
         }
 
-        Utils.showLoading();
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             const userId = window.AuthManager.getUserId();
@@ -166,13 +184,23 @@ class MainApp {
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
             
-            Utils.showToast('Data exported successfully', 'success');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Data exported successfully', 'success');
+            } else {
+                alert('Data exported successfully');
+            }
 
         } catch (error) {
             console.error('Error exporting data:', error);
-            Utils.showToast('Failed to export data', 'error');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Failed to export data', 'error');
+            } else {
+                alert('Failed to export data');
+            }
         } finally {
-            Utils.hideLoading();
+            if (window.Utils && window.Utils.hideLoading) {
+                window.Utils.hideLoading();
+            }
         }
     }
 
@@ -212,7 +240,11 @@ class MainApp {
                 
                 if (outcome === 'accepted') {
                     console.log('User accepted the install prompt');
-                    Utils.showToast('App installed successfully!', 'success');
+                    if (window.Utils && window.Utils.showToast) {
+                        window.Utils.showToast('App installed successfully!', 'success');
+                    } else {
+                        alert('App installed successfully!');
+                    }
                 } else {
                     console.log('User dismissed the install prompt');
                 }
@@ -256,7 +288,9 @@ class MainApp {
             if (offlineIndicator) {
                 offlineIndicator.classList.add('hidden');
             }
-            Utils.showToast('You are back online', 'success');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('You are back online', 'success');
+            }
             
             // Sync any pending changes
             this.syncPendingChanges();
@@ -266,7 +300,9 @@ class MainApp {
             if (offlineIndicator) {
                 offlineIndicator.classList.remove('hidden');
             }
-            Utils.showToast('You are offline. Changes will sync when reconnected.', 'warning');
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('You are offline. Changes will sync when reconnected.', 'warning');
+            }
         });
         
         // Initial check
@@ -316,7 +352,7 @@ class MainApp {
 
     initializeDateFields() {
         // Set today's date as default for date inputs
-        const today = Utils.getCurrentDate();
+        const today = window.Utils ? window.Utils.getCurrentDate() : new Date().toISOString().split('T')[0];
         document.querySelectorAll('input[type="date"]').forEach(input => {
             if (!input.value) {
                 input.value = today;
@@ -330,7 +366,9 @@ class MainApp {
 document.addEventListener('DOMContentLoaded', () => {
     // Hide loading screen after everything is loaded
     setTimeout(() => {
-        Utils.hideLoading();
+        if (window.Utils && window.Utils.hideLoading) {
+            window.Utils.hideLoading();
+        }
     }, 1000);
     
     // Initialize main app
