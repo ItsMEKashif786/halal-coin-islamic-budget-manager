@@ -90,20 +90,46 @@ class AuthManager {
             return;
         }
 
+        // Validate mobile number
+        if (!/^\d{10}$/.test(mobile)) {
+            Utils.showToast('Please enter a valid 10-digit mobile number', 'error');
+            return;
+        }
+
+        // Validate email
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            Utils.showToast('Please enter a valid email address', 'error');
+            return;
+        }
+
         Utils.showLoading();
 
         try {
+            console.log('Attempting login with:', { name, mobile, email });
+            
             // Check if user exists in Supabase
             const { data: existingUsers, error } = await supabase
                 .from('users')
                 .select('*')
                 .or(`mobile.eq.${mobile},email.eq.${email}`);
 
-            if (error) throw error;
+            console.log('Supabase query result:', { existingUsers, error });
+
+            if (error) {
+                console.error('Supabase query error:', error);
+                // Check if table doesn't exist
+                if (error.message && error.message.includes('relation "users" does not exist')) {
+                    console.log('Using localStorage fallback for login');
+                    this.handleLocalStorageLogin(name, mobile, email, rememberMe);
+                    return;
+                }
+                throw error;
+            }
 
             let user = existingUsers?.[0];
 
             if (!user) {
+                console.log('No existing user, creating new user...');
                 // Create new user if doesn't exist (auto-register)
                 const { data: newUser, error: createError } = await supabase
                     .from('users')
@@ -111,9 +137,14 @@ class AuthManager {
                     .select()
                     .single();
 
-                if (createError) throw createError;
+                if (createError) {
+                    console.error('Create user error:', createError);
+                    throw createError;
+                }
                 user = newUser;
+                console.log('New user created:', user);
             } else {
+                console.log('Existing user found:', user);
                 // Update user info if changed
                 if (user.name !== name || user.email !== email) {
                     const { error: updateError } = await supabase
@@ -146,7 +177,7 @@ class AuthManager {
             
         } catch (error) {
             Utils.hideLoading();
-            console.error('Login error:', error);
+            console.error('Login error details:', error);
             Utils.showToast('Login failed. Please try again.', 'error');
         }
     }
@@ -176,13 +207,26 @@ class AuthManager {
         Utils.showLoading();
 
         try {
+            console.log('Attempting registration with:', { name, mobile, email });
+            
             // Check if user already exists
             const { data: existingUsers, error: checkError } = await supabase
                 .from('users')
                 .select('*')
                 .or(`mobile.eq.${mobile},email.eq.${email}`);
 
-            if (checkError) throw checkError;
+            console.log('Supabase check result:', { existingUsers, checkError });
+
+            if (checkError) {
+                console.error('Supabase check error:', checkError);
+                // If table doesn't exist, use localStorage fallback
+                if (checkError.message && checkError.message.includes('relation "users" does not exist')) {
+                    console.log('Using localStorage fallback for registration');
+                    this.handleLocalStorageRegistration(name, mobile, email);
+                    return;
+                }
+                throw checkError;
+            }
 
             if (existingUsers && existingUsers.length > 0) {
                 Utils.hideLoading();
@@ -198,7 +242,12 @@ class AuthManager {
                 .select()
                 .single();
 
-            if (createError) throw createError;
+            if (createError) {
+                console.error('Create user error:', createError);
+                throw createError;
+            }
+
+            console.log('User registered successfully:', user);
 
             // Auto-login after registration
             this.currentUser = user;
@@ -217,6 +266,55 @@ class AuthManager {
             console.error('Registration error:', error);
             Utils.showToast('Registration failed. Please try again.', 'error');
         }
+    }
+
+    handleLocalStorageRegistration(name, mobile, email) {
+        // Fallback to localStorage when Supabase is not available
+        const user = {
+            id: 'local-' + Date.now(),
+            name,
+            mobile,
+            email,
+            created_at: new Date().toISOString()
+        };
+        
+        this.currentUser = user;
+        localStorage.setItem('halalCoinUser', JSON.stringify(user));
+        localStorage.setItem('halalCoinRememberMe', 'true');
+        
+        Utils.hideLoading();
+        Utils.showToast('Registration successful (offline mode)!', 'success');
+        this.showApp();
+        
+        // Update UI with user info
+        this.updateUserUI();
+    }
+
+    handleLocalStorageLogin(name, mobile, email, rememberMe) {
+        // Fallback to localStorage when Supabase is not available
+        const user = {
+            id: 'local-' + Date.now(),
+            name,
+            mobile,
+            email,
+            created_at: new Date().toISOString()
+        };
+        
+        this.currentUser = user;
+        
+        if (rememberMe) {
+            localStorage.setItem('halalCoinUser', JSON.stringify(user));
+            localStorage.setItem('halalCoinRememberMe', 'true');
+        } else {
+            sessionStorage.setItem('halalCoinUser', JSON.stringify(user));
+        }
+        
+        Utils.hideLoading();
+        Utils.showToast('Login successful (offline mode)!', 'success');
+        this.showApp();
+        
+        // Update UI with user info
+        this.updateUserUI();
     }
 
     handleLogout() {
