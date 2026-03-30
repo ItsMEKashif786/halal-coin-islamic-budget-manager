@@ -21,7 +21,9 @@ class AuthManager {
             if (savedUser && rememberMe) {
                 this.currentUser = JSON.parse(savedUser);
                 this.showApp();
-                Utils.showToast('Welcome back!', 'success');
+                if (window.Utils && window.Utils.showToast) {
+                    window.Utils.showToast('Welcome back!', 'success');
+                }
             } else {
                 this.showAuth();
             }
@@ -200,11 +202,19 @@ class AuthManager {
 
         // Validate email
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            Utils.showToast('Please enter a valid email address', 'error');
+            // Fallback if Utils is not available
+            if (window.Utils && window.Utils.showToast) {
+                window.Utils.showToast('Please enter a valid email address', 'error');
+            } else {
+                alert('Please enter a valid email address');
+            }
             return;
         }
 
-        Utils.showLoading();
+        // Use window.Utils to ensure it's accessible
+        if (window.Utils && window.Utils.showLoading) {
+            window.Utils.showLoading();
+        }
 
         try {
             console.log('Attempting registration with:', { name, mobile, email });
